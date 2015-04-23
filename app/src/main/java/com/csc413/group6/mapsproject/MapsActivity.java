@@ -1,4 +1,4 @@
-package com.example.swati.mapsproject;
+package com.csc413.group6.mapsproject;
 
 import android.content.Context;
 import android.location.Location;
