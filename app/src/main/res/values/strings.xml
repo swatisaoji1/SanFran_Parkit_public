@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">mapsproject</string>
-    <string name="title_activity_maps">Easy Park</string>
-    <string name="start_text">Search</string>
-    <string name="cancel_text">Favorite</string>
-</resources>
