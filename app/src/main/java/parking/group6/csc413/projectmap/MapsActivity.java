@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,25 +23,43 @@ public class MapsActivity extends ActionBarActivity {
     Context myContext = this;
     LocationManager mLocationManager;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private LatLng center;
+    TextView markerText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        markerText = (TextView) findViewById(R.id.locationMarkertext);
+
         setUpMapIfNeeded();
 
+        mMap.clear();
+        markerText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                center = mMap.getCameraPosition().target;
+                getMessageFromSFpark(center.latitude, center.longitude);
+            }
+        });
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        /*mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                // get the latitude and longitude of the center
+                center = mMap.getCameraPosition().target;
+                getMessageFromSFpark(center.latitude, center.longitude);
+            }
+        });*/
+
+       /* mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                //Toast.makeText(getApplicationContext(),("loc: "+ latLng.latitude + ", " + latLng.longitude), Toast.LENGTH_LONG).show();
                 // get longitude and latitude
                 getMessageFromSFpark(latLng.latitude, latLng.longitude);
 
-
-
             }
-        });
+        });*/
     }
 
     @Override
