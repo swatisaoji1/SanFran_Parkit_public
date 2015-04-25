@@ -33,6 +33,7 @@
                 android:text="Right here.."
                 android:textColor="@android:color/white" />
 
+
             <ImageView
                 android:id="@+id/imageView1"
                 android:layout_width="50dp"
