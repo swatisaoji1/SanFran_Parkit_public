@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +41,32 @@ public class MapsActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 center = mMap.getCameraPosition().target;
-                getMessageFromSFpark(center.latitude, center.longitude);
+
+                PopupMenu popup = new PopupMenu(MapsActivity.this, v);
+                popup.getMenuInflater().inflate(R.menu.pop_up, popup.getMenu());
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.park_me:
+                                Toast.makeText(MapsActivity.this, "Park me", Toast.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.search_parking:
+                                getMessageFromSFpark(center.latitude, center.longitude);
+                                return true;
+                            case R.id.mark_fav:
+                                Toast.makeText(MapsActivity.this, "Mark Fav", Toast.LENGTH_SHORT).show();
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+                // Handle dismissal with: popup.setOnDismissListener(...);
+                // Show the menu
+                popup.show();
+
+
+
             }
         });
 

@@ -30,7 +30,7 @@
                 android:minWidth="100dp"
                 android:paddingLeft="2dp"
                 android:paddingRight="2dp"
-                android:text=" find parking"
+                android:text="Right here.."
                 android:textColor="@android:color/white" />
 
             <ImageView
