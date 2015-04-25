@@ -48,6 +48,8 @@ public class MapsActivity extends ActionBarActivity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.park_me:
+                                mMap.clear();
+                                mMap.addMarker(new MarkerOptions().position(center).title("Parked"));
                                 Toast.makeText(MapsActivity.this, "Park me", Toast.LENGTH_SHORT).show();
                                 return true;
                             case R.id.search_parking:
