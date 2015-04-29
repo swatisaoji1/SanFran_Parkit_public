@@ -202,12 +202,15 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         final Dialog dialog = new Dialog(this);
         View view = getLayoutInflater().inflate(R.layout.dialogue_list, null);
         ListView lv = (ListView) view.findViewById(R.id.parking_list);
-        DialogueListAdapter myPark = new DialogueListAdapter(MapsActivity.this, parkingList);
+         DialogueListAdapter myPark = new DialogueListAdapter(MapsActivity.this, parkingList);
         // on click listener here:
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // show action items
+                Parking newOne = (Parking)parent.getAdapter().getItem(position);
+                // now add parking to database.
+                addParkingtoDB(newOne);
             }
         });
 
@@ -217,4 +220,10 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         dialog.show();
 
     }
+
+    public void addParkingtoDB(Parking parking){
+        ConnectDB db = new ConnectDB(myContext);
+        db.addParking(parking);
+    }
+
 }

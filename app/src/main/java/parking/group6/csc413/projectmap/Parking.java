@@ -9,7 +9,7 @@ public class Parking {
     private String address;
     private Double latitude;
     private Double longitude;
-    private String times = "we will set it later :)";
+    private String times = "TIME here";
     private boolean isFavorite = false;
 
     public Parking() {

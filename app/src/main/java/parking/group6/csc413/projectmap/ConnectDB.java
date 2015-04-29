@@ -63,6 +63,7 @@ public class ConnectDB extends SQLiteOpenHelper  {
         db.close();
     }
 
+
     public Parking getParking(Parking parking) {
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
