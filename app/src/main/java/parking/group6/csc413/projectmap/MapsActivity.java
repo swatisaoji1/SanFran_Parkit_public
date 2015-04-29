@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -202,6 +203,13 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         View view = getLayoutInflater().inflate(R.layout.dialogue_list, null);
         ListView lv = (ListView) view.findViewById(R.id.parking_list);
         DialogueListAdapter myPark = new DialogueListAdapter(MapsActivity.this, parkingList);
+        // on click listener here:
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // show action items
+            }
+        });
 
         lv.setAdapter(myPark);
         dialog.setTitle("Parking Nearby :");
