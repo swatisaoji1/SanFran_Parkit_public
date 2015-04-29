@@ -3,9 +3,6 @@ package parking.group6.csc413.projectmap;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -19,22 +16,32 @@ import java.net.URL;
 /**
  * Created by Swati on 4/17/2015.
  */
-public class GetParking extends AsyncTask<String, String, String> {
+public class GetParking extends AsyncTask<String, String, JSONObject> {
 
     private Context context;
-    private Handler handler;
+    getDataFromAsync dataListener;
+    //private Handler handler;
     private ProgressDialog dialog;
-    String data="";
+    //String data="";
 
     JSONObject result = null;
     String message = "No Message";
     String json = null;
 
     //constructor
+    /*
     public GetParking(Context context,Handler handler,String data){
         this.context = context;
         this.handler = handler;
         this.data=data;
+        dialog = new ProgressDialog(context);
+
+    }
+    */
+
+    public GetParking(Context context,getDataFromAsync dataList){
+        this.context = context;
+        this.dataListener = dataList;
         dialog = new ProgressDialog(context);
 
     }
@@ -47,8 +54,19 @@ public class GetParking extends AsyncTask<String, String, String> {
      }
 
     @Override
-    protected String doInBackground(String... params) {
+    protected JSONObject doInBackground(String... params) {
         result = getJSONFromUrl(params[0]);
+        //Parking[] parkArray;
+
+        //parse the returned jason object
+        /*
+        try {
+            parkArray = JSONParseSF.parseJsonFromSF(result);
+        } catch (JSONException e) {
+            Log.e("Error", "Exception from  JSONParseSF.parseJsonFromSF ");
+            e.printStackTrace();
+        }
+    */
         try{
             if(result != null){
                 message = result.getString("MESSAGE");
@@ -57,21 +75,23 @@ public class GetParking extends AsyncTask<String, String, String> {
             Log.e("Error", "Do in Background ");
         }
 
-        return message;
+        return result;
     }
 
     @Override
-    protected void onPostExecute(String message) {
-        super.onPostExecute(message);
+    protected void onPostExecute(JSONObject result) {
+        super.onPostExecute(result);
+        dataListener.onTaskCompleted(result);
         if (dialog.isShowing()) {
             dialog.dismiss();
         }
+
         // bundle the result and send through handler
-        Message msg = Message.obtain();
+       /* Message msg = Message.obtain();
         Bundle b = new Bundle();
         b.putSerializable("data", this.message);
-        msg.setData(b);
-        handler.sendMessage(msg);
+        msg.setData(b);*/
+        //handler.sendMessage(msg);
 
     //MapsActivity mp = new MapsActivity();
     //mp.showMsg(message);
