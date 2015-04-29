@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 /**
  * These functions are used to manage the SQLite database. Basic functionality includes adding,
  * deleting, and searching for favorite addresses.
@@ -64,6 +66,36 @@ public class ConnectDB extends SQLiteOpenHelper  {
     }
 
 
+    public ArrayList<Parking> getParkingList(){
+        // 1. get reference to readable DB
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // 2. build and execute query
+        String query = "Select * FROM " + FAVORITES_TABLE ;
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<Parking> parkingList = new ArrayList<Parking>();
+        Parking parking = new Parking();
+        // 3. create an object to store the query results if found
+        // currently returns only first item
+        if(cursor.moveToFirst()) {
+            // cursor.moveToFirst();
+            while (cursor.moveToNext()) {
+                parking = new Parking();
+                parking.setAddress(cursor.getString(1));
+                parking.setLatitude(Double.parseDouble(cursor.getString(2)));
+                parking.setLongitude(Double.parseDouble(cursor.getString(3)));
+                parking.setTimes(cursor.getString(4));
+                parkingList.add(parking);
+
+            }
+
+            cursor.close();
+        }
+        db.close();
+        return parkingList;
+    }
+
+    // following method to be removed : just kept for reference
     public Parking getParking(Parking parking) {
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();

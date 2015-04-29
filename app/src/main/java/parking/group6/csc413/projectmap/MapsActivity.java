@@ -32,6 +32,7 @@ import java.util.List;
 import parking.group6.csc413.projectmap.Adapters.DialogueListAdapter;
 
 public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
+    ConnectDB db;
     Context myContext = this;
     LocationManager mLocationManager;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -172,6 +173,17 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.cancel_action:
+                String check = checkParkingDB();
+                showMsg(check);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onTaskCompleted(JSONObject jobj) {
         // method of the interface getDataFromAsync
 
@@ -211,6 +223,11 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
                 Parking newOne = (Parking)parent.getAdapter().getItem(position);
                 // now add parking to database.
                 addParkingtoDB(newOne);
+                Toast.makeText(myContext, "added to db", Toast.LENGTH_LONG).show();
+                dialog.dismiss();
+
+
+
             }
         });
 
@@ -222,8 +239,20 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
     }
 
     public void addParkingtoDB(Parking parking){
-        ConnectDB db = new ConnectDB(myContext);
+        db = new ConnectDB(myContext);
         db.addParking(parking);
+    }
+
+    public String checkParkingDB(){
+        db = new ConnectDB(myContext);
+        ArrayList<Parking> parkList = db.getParkingList();
+        Parking parkFav = parkList.get(parkList.size() - 1);
+        String s = "FROM DB :Total items="
+                +  parkList.size()
+                + "\nLast Address = "
+                + parkFav.getAddress();
+        return s;
+
     }
 
 }
