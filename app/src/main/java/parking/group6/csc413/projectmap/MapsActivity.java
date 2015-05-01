@@ -2,15 +2,19 @@ package parking.group6.csc413.projectmap;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -37,6 +41,15 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
     LocationManager mLocationManager;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LatLng center;
+
+    //--ANSHUL
+    private ListView mDrawerList;
+    private DrawerLayout mDrawerLayout;
+    private ArrayAdapter<String> mAdapter;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private String mActivityTitle;
+    //--END_ANSHUL
+
     TextView markerText;
     Parking[] parkings = null;
     ArrayList<Parking> parkingList = new ArrayList<Parking>();
@@ -46,6 +59,12 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         markerText = (TextView) findViewById(R.id.locationMarkertext);
+
+        //--ANSHUL
+        mDrawerList = (ListView)findViewById(R.id.navList);
+        mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mActivityTitle = getTitle().toString();
+        //--END_ANSHUL
 
         setUpMapIfNeeded();
 
@@ -84,6 +103,14 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
             }
         });
 
+        //--ANSHUL
+        addDrawerItems();
+        setupDrawer();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+        //--END_ANSHUL
+
     }// end oncreate
 
     @Override
@@ -91,6 +118,21 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         super.onResume();
         setUpMapIfNeeded();
     }
+
+    //--ANSHUL
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+    //--END_ANSHUL
 
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
@@ -180,6 +222,13 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
                 String check = checkParkingDB();
                 showMsg(check);
         }
+
+        //--ANSHUL
+        // Activate the navigation drawer toggle
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        //--END_ANSHUL
         return super.onOptionsItemSelected(item);
     }
 
@@ -255,4 +304,40 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
     }
 
+    //--ANSHUL
+    private void addDrawerItems() {
+        String[] parkArray = { "Favourites", "Broadcast", "Settings", "Contact Us", "Rate the app" };
+        mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, parkArray);
+        mDrawerList.setAdapter(mAdapter);
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupDrawer() {
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle("Navigation!");
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+                super.onDrawerClosed(view);
+                getSupportActionBar().setTitle(mActivityTitle);
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+
+        mDrawerToggle.setDrawerIndicatorEnabled(true);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+    }
+    //--END_ANSHUL
 }
