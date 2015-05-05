@@ -59,11 +59,11 @@ public class JSONParseSF {
 
     private static String parseRate(JSONObject rateObject) throws JSONException {
         StringBuilder sb = new StringBuilder();
-        sb.append(rateObject.get("BEG"));
+        sb.append(rateObject.getString("BEG"));
         sb.append("-");
-        sb.append(rateObject.get("END"));
+        sb.append(rateObject.getString("END"));
         sb.append(" Cost per hour:");
-        sb.append(rateObject.get("RATE"));
+        sb.append(rateObject.getString("RATE"));
         return sb.toString();
     }
 }
