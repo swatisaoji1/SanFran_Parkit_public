@@ -25,7 +25,7 @@ public class JSONParseSF {
                 parkArray[i].setAddress(jo.getString("NAME")); // get the address and set it
                 parkArray[i].setLatLong(jo.getString("LOC"));  // set latitude and longitude
                 if(jo.has("RATES"))
-                    parkArray[i].setTimes(parseRates(jo.getJSONObject("RATES"))); // set times array
+                    parkArray[i].setTimes(parseRates(jo)); // set times array
                 else {
                     String[] noInfo = new String[1];
                     noInfo[0] = "No info";
