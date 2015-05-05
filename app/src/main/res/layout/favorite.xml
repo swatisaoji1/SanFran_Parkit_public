@@ -14,8 +14,8 @@
         android:textColor="@android:color/white" />
 
     <ListView
-        android:layout_width=""
-        android:layout_height=""></ListView>
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"></ListView>
 
 
 </LinearLayout>
