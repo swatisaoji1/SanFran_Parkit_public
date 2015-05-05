@@ -56,7 +56,7 @@ public class ConnectDB extends SQLiteOpenHelper  {
         values.put(ADDRESS_COL, newParking.getAddress());
         values.put(LATITUDE_COL, newParking.getLatitude());
         values.put(LONGITUDE_COL, newParking.getLongitude());
-        values.put(TIMES_COL, newParking.getTimes());
+        values.put(TIMES_COL, newParking.getTimesAsString());
 
         // 3. insert values
         db.insert(FAVORITES_TABLE, null, values);
@@ -84,7 +84,7 @@ public class ConnectDB extends SQLiteOpenHelper  {
                 parking.setAddress(cursor.getString(1));
                 parking.setLatitude(Double.parseDouble(cursor.getString(2)));
                 parking.setLongitude(Double.parseDouble(cursor.getString(3)));
-                parking.setTimes(cursor.getString(4));
+                //parking.setTimes(cursor.getString(4));
                 parkingList.add(parking);
 
             }
@@ -93,33 +93,6 @@ public class ConnectDB extends SQLiteOpenHelper  {
         }
         db.close();
         return parkingList;
-    }
-
-    // following method to be removed : just kept for reference
-    public Parking getParking(Parking parking) {
-        // 1. get reference to readable DB
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        // 2. build and execute query
-        String query = "Select * FROM " + FAVORITES_TABLE + " WHERE "
-                       + ADDRESS_COL + " =   \"" + parking.getAddress() + "\"";
-        Cursor cursor = db.rawQuery(query, null);
-
-        // 3. create an object to store the query results if found
-        Parking returnParking = new Parking();
-        if(cursor.moveToFirst()) {
-            cursor.moveToFirst();
-            parking.setAddress(cursor.getString(1));
-            parking.setLatitude(Double.parseDouble(cursor.getString(2)));
-            parking.setLongitude(Double.parseDouble(cursor.getString(3)));
-            parking.setTimes(cursor.getString(4));
-            cursor.close();
-        } else {
-        // else return null;
-            returnParking = null;
-        }
-        db.close();
-        return returnParking;
     }
 
     public void deleteParking(Parking parking) {

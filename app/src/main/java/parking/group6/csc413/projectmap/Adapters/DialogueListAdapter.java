@@ -53,7 +53,7 @@ public class DialogueListAdapter extends BaseAdapter {
         }
 
         holder.addressView.setText(ParkingListData.get(position).getAddress());
-        holder.timeView.setText(ParkingListData.get(position).getTimes());
+        holder.timeView.setText(ParkingListData.get(position).getTimesAsString());
 
         return convertView;
     }
