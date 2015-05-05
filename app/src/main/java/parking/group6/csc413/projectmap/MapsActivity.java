@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -175,8 +174,8 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         switch (position) {
             case 0:
                 // uncomment the following and work on FavoriteFrag class
-                //fragment = new FavoriteFrag();
-                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
+                fragment = new FavoriteFrag();
+                //Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
                 break;
             case 1:
                 if (!(fragment instanceof HomeMapFrag)){

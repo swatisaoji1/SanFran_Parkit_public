@@ -13,5 +13,9 @@
         android:text="TEST VIEW"
         android:textColor="@android:color/white" />
 
+    <ListView
+        android:layout_width=""
+        android:layout_height=""></ListView>
+
 
 </LinearLayout>

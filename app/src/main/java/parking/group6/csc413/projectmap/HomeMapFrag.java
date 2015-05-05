@@ -107,6 +107,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // TODO Auto-generated method stub
+
        setUpMapIfNeeded();
     }
 
@@ -115,6 +116,8 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         super.onResume();
         setUpMapIfNeeded();
     }
+
+    /*
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -124,6 +127,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             mMap = null;
         }
     }
+    */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
