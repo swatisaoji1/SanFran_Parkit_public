@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -56,7 +57,7 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         //--END_ANSHUL
 
         if (savedInstanceState == null) {
-            selectItem(1);
+            selectItem(0);
         }
 
     }// end oncreate
@@ -93,7 +94,7 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        getMenuInflater().inflate(R.menu.main, menu);
+       // getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -126,7 +127,7 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
     //--ANSHUL
     private void addDrawerItems() {
-        String[] parkArray = { "Favourites", "Broadcast", "Settings", "Contact Us", "Rate the app" };
+        String[] parkArray = { "Map", "Favorites", "Park Me", "Contact Us", "Rate the app" };
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, parkArray);
         mDrawerList.setAdapter(mAdapter);
 
@@ -173,20 +174,21 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         // Insert the fragment by replacing any existing fragment
         switch (position) {
             case 0:
-                // uncomment the following and work on FavoriteFrag class
-                fragment = new FavoriteFrag();
-                //Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
-                break;
-            case 1:
                 if (!(fragment instanceof HomeMapFrag)){
                     fragment = new HomeMapFrag();
                 }
-
-
+                break;
+            case 1:
+                fragment = new FavoriteFrag();
+                break;
+            case 2:
+                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
+                break;
+            case 3:
+                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
+                break;
             default:
-
-
-
+                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
                 break;
         }
 

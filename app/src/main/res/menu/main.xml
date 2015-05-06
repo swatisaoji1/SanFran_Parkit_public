@@ -1,7 +1,10 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:yourapp="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/start_action"
-        android:title="@string/start_text" />
+        android:icon="@drawable/park_me"
+        android:id="@+id/park_me"
+        android:title="park me"
+        yourapp:showAsAction="always"/>
     <item
         android:id="@+id/cancel_action"
         android:title="@string/cancel_text" />

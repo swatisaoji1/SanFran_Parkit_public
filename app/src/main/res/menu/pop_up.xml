@@ -2,12 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@drawable/round_corner">
     <item
-        android:id="@+id/park_me"
-        android:title="park_me" />
-    <item
         android:id="@+id/search_parking"
         android:title="search parking" />
-    <item
-        android:id="@+id/mark_fav"
-        android:title="Mark Favorite" />
+
 </menu>

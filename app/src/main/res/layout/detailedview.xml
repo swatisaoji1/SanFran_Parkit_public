@@ -1,0 +1,76 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:layout_marginTop="50dp"
+    android:orientation="vertical"
+    android:background = "#000000"
+    android:gravity="bottom"
+    >
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight=".7"
+        android:orientation="vertical"
+        android:id="@+id/ll_text"
+        >
+
+
+    <TextView
+        android:text="@string/str_add"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/str_add"
+   />
+
+
+
+    <TextView
+        android:text="@string/time_street_open_1"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/time_tv" />
+
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/cross_btn"
+        android:src="@drawable/cross"
+        android:maxWidth="20dp"
+        android:maxHeight="20dp"
+       android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
+         />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/ll_text">
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Mark Fav"
+            android:id="@+id/fav_btn"
+            />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Navigate"
+            android:id="@+id/nav_btn"
+            />
+        </LinearLayout>
+      </RelativeLayout>

@@ -6,4 +6,8 @@
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="str_add">Street Address</string>
+    <string name="time_street_open">Time: 00:00AM</string>
+    <string name="time_street_open_1">09:00AM-12:00PM</string>
 </resources>

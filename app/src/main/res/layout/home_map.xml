@@ -27,10 +27,10 @@
             android:layout_height="wrap_content"
             android:background="@drawable/round_corner"
             android:gravity="center"
-            android:minWidth="100dp"
+            android:minWidth="50dp"
             android:paddingLeft="2dp"
             android:paddingRight="2dp"
-            android:text="Right here.."
+            android:text="here.."
             android:textColor="@android:color/white" />
 
 
