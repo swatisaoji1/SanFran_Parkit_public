@@ -14,9 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.PopupMenu;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -208,6 +209,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                 // show action items
                 Parking newOne = (Parking)parent.getAdapter().getItem(position);
                 // now add parking to database.
+
                 addParkingtoDB(newOne);
                 Toast.makeText(myContext, "added to db", Toast.LENGTH_LONG).show();
                 dialog.dismiss();
@@ -243,6 +245,8 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     public void showMsg(String msg){
         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show();
     }
+
+
     @Override
     public void onTaskCompleted(JSONObject jobj) {
         // method of the interface getDataFromAsync
@@ -260,11 +264,28 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             //String address = parkings[0].getAddress();
             //Toast.makeText(myContext, address, Toast.LENGTH_LONG).show();
             if(parkingList.size()>0){
-                showListDialogue();
+                //showListDialogue();
+                putMarkers(parkingList);
+                //TODO check this code
+
             }else{
                 Toast.makeText(myContext, "SORRY !! NO PARKING DATA !", Toast.LENGTH_LONG).show();
             }
 
+        }
+    }
+
+
+    public void putMarkers(ArrayList<Parking> parking){
+        if(parkingList.size()>0){
+            for(int i=0; i< parkingList.size(); i++){
+                Parking thisParking = parkingList.get(i);
+                final LatLng ll = new LatLng(thisParking.getLatitude(), thisParking.getLongitude());
+                if (mMap !=null){
+                     mMap.addMarker(new MarkerOptions().position(ll).title("ll"));
+                 }
+
+            }
         }
     }
 }
