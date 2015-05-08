@@ -1,0 +1,76 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:layout_marginTop="50dp"
+    android:orientation="vertical"
+    android:background = "#000000"
+    android:gravity="bottom"
+    >
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight=".7"
+        android:orientation="vertical"
+        android:id="@+id/ll_text"
+        >
+
+
+        <TextView
+            android:text="@string/park_me_head"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/park_me_head"
+            />
+
+
+
+        <TextView
+            android:text="@string/park_me"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/time_tv" />
+
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/cross_btn_1"
+        android:src="@drawable/cross"
+        android:maxWidth="20dp"
+        android:maxHeight="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
+        />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/ll_text">
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:id="@+id/cancel"
+            />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Yes"
+            android:id="@+id/park_me_yes"
+            />
+    </LinearLayout>
+</RelativeLayout>

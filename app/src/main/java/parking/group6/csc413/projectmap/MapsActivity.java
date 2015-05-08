@@ -182,7 +182,8 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
                 fragment = new FavoriteFrag();
                 break;
             case 2:
-                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
+                // park me button
+
                 break;
             case 3:
                 Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();

@@ -10,4 +10,8 @@
     <string name="str_add">Street Address</string>
     <string name="time_street_open">Time: 00:00AM</string>
     <string name="time_street_open_1">09:00AM-12:00PM</string>
+
+
+    <string name="park_me_head">Park here</string>
+    <string name="park_me">Do you want to park</string>
 </resources>

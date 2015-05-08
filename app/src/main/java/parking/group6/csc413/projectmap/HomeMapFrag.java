@@ -58,21 +58,24 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     Context myContext = null;
     LocationManager mLocationManager;
     MapView mapView ;
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    static private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private LatLng center;
     TextView markerText;
     Parking[] parkings = null;
     ArrayList<Parking> parkingList = new ArrayList<Parking>();
     LatLng searchPoint;
     View mainPin;
-
+    int parkMe = 0;
     protected int mDpi = 0;
     private HashMap<Marker, Parking> mark_park = new HashMap<Marker, Parking>();
     Dialog dialog;
-    LatLng myCurrentLocation;
-    public HomeMapFrag(){
+    static LatLng myCurrentLocation;
 
+
+    public HomeMapFrag(){
     }
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -201,11 +204,15 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                     boolean doNotMoveCameraToCenterMarker = true;
                     public boolean onMarkerClick(Marker marker) {
                         //marker.showInfoWindow();
-
                         if((dialog != null) && dialog.isShowing()){
                             dialog.dismiss();
                         }
-                        displayPopUp(marker);
+                        if(mark_park.containsKey(marker)){
+                            displayPopUp(marker);
+                        }else{
+                            marker.showInfoWindow();
+                        }
+
                         return doNotMoveCameraToCenterMarker;
                     }
                 });
@@ -222,32 +229,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.park_me:
-                Location myLocation = getLastKnownLocation();
-                if(myLocation!= null){
-                    myCurrentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myCurrentLocation, 13));
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), 4);
-                    builder.setMessage(" Wanna Park ? ")
-                            .setTitle("Found a spot? GREAT !! ")
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            })
-                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    AlertDialog dialog = builder.create();
-                    Window win = dialog.getWindow();
-                    win.setGravity(Gravity.BOTTOM);
-                    dialog.show();
-                }else{
-                    Toast.makeText(getActivity(), "cant get loc, GPS may be OFF !!", Toast.LENGTH_LONG).show();
-                }
+               park_me1();
                 //Toast.makeText(getActivity(), "Parked dummy", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -321,6 +303,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         db.addParking(parking);
     }
 
+
     public String checkParkingDB(){
         db = new ConnectDB(myContext);
         ArrayList<Parking> parkList = db.getParkingList();
@@ -330,8 +313,8 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                 + "\nLast Address = "
                 + parkFav.getAddress();
         return s;
-
     }
+
     public void showMsg(String msg){
         Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show();
     }
@@ -467,4 +450,122 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         }
     }
 
+
+    public void park_me(){
+        Location myLocation = getLastKnownLocation();
+        if(myLocation!= null){
+            myCurrentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myCurrentLocation, 13));
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), 4);
+            builder.setMessage(" Wanna Park ? ")
+                    .setTitle("Found a spot? GREAT !! ")
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            if(Global_var.getState()==0){
+
+                            }
+                            int x =  Global_var.getState();
+                            String parkingState = "parked stats = " +  x;
+                            Toast.makeText(myContext,parkingState, Toast.LENGTH_SHORT ).show();
+                            Global_var.setState(1);
+                            x = Global_var.getState();
+                            parkingState = "parked stats changed= " + Global_var.getState() ;
+                            Toast.makeText(myContext,parkingState, Toast.LENGTH_SHORT ).show();
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog dialog = builder.create();
+            Window win = dialog.getWindow();
+            win.setGravity(Gravity.BOTTOM);
+            dialog.show();
+        }else{
+            Toast.makeText(getActivity(), "cant get loc, GPS may be OFF !!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    public void park_me1() {
+        Location myLocation = getLastKnownLocation();
+        if (myLocation != null) {
+            myCurrentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myCurrentLocation, 13));
+            dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+            dialog.setCanceledOnTouchOutside(true);
+            dialog.setContentView(R.layout.park_me_dialog);
+            dialog.setTitle(null);
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    //do something on dismiss
+                }
+            });
+            // Setting dialogview
+            Window window = dialog.getWindow();
+            window.setGravity(Gravity.BOTTOM);
+            WindowManager.LayoutParams params = window.getAttributes();
+
+            params.gravity = Gravity.BOTTOM;
+            window.setAttributes(params);
+
+
+            // components
+            // Getting reference to the TextView to set latitude
+            TextView tv1 = (TextView) dialog.findViewById(R.id.park_me_head);
+            TextView tv2 = (TextView) dialog.findViewById(R.id.park_me);
+            Button cancel = (Button) dialog.findViewById(R.id.cancel);
+            Button yes_btn = (Button) dialog.findViewById(R.id.park_me_yes);
+            ImageView cross = (ImageView) dialog.findViewById(R.id.cross_btn_1);
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //add parking markers.
+                    Bitmap bMap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.flag);
+                    Bitmap adjustedImage = Bitmap.createScaledBitmap(bMap, 100, 100, true);
+                    Bitmap newImage = adjustImage(adjustedImage);
+                    BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(newImage);
+
+                    Marker mark = mMap.addMarker(new MarkerOptions().position(myCurrentLocation).title("Parked").icon(icon));
+                    startParkingTimer();
+                    Toast.makeText(getActivity(), "This works", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                }
+            });
+            cross.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    dialog.dismiss();
+
+                }
+            });
+            // Setting the Text
+            //street.setText(parking.getAddress());
+            //time.setText(parking.getTimesAsString());
+
+            dialog.show();
+
+
+        }else{
+            Toast.makeText(getActivity(), "cant get loc, GPS may be OFF !!", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+
+    public void  startParkingTimer(){
+        showTimeOptions();
+
+    }
+
+    public void showTimeOptions(){
+
+    }
 }
