@@ -1,14 +1,19 @@
 package parking.group6.csc413.projectmap;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -17,14 +22,13 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,13 +46,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
-import parking.group6.csc413.projectmap.Adapters.DialogueListAdapter;
-
+import java.util.Locale;
 /**
  * Created by Swati on 5/5/2015.
  */
@@ -71,6 +75,14 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     Dialog dialog;
     static LatLng myCurrentLocation;
 
+    //controls after parkes
+    LatLng parked;
+    View controlv;
+    TextView parker_info;
+    Button take_to_car_btn;
+    Button unPark;
+
+
 
     public HomeMapFrag(){
     }
@@ -90,10 +102,41 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         View rootView = inflater.inflate(R.layout.home_map, container, false);
         markerText = (TextView) rootView.findViewById(R.id.locationMarkertext);
         mainPin = rootView.findViewById(R.id.locationMarker);
-        //mMap.clear();
+
+        setUpMapIfNeeded();
+        controlv = rootView.findViewById(R.id.controls_parked);
+        parker_info = (TextView)rootView.findViewById(R.id.parked_info);
+        take_to_car_btn= (Button)rootView.findViewById(R.id.walk_to_Car);
+        unPark = (Button)rootView.findViewById(R.id.un_park);
+
         myContext = getActivity();
         mDpi = getActivity().getResources().getDisplayMetrics().densityDpi;
 
+        //SharedPreferences pref = getActivity().getSharedPreferences(PREFS_NAME,Context.MODE_PRIVATE);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        long time;
+        String add ="";
+        if(pref.contains("parked")){
+            if(pref.getInt("parked", 0)==1){
+                controlv.setVisibility(View.VISIBLE);
+                parked = getParkingSharedPref();
+                if(parked != null){
+                    add = "You are parked at :\n"
+                            + getCompleteAddressString(parked.latitude, parked.longitude);
+                    if(pref.contains("time")){
+                        time = pref.getLong("time", 0);
+                        Date date = new Date(time);
+                        String result = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(date);
+                        add = add + "\nSince: " + result;
+                    }
+                    parker_info.setText(add);
+                    Marker mark = mMap.addMarker(new MarkerOptions().position(parked).title("You are parked here"));
+                    mark.showInfoWindow();
+                    mainPin.setVisibility(View.INVISIBLE);
+                }
+
+            }
+        }
         markerText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,9 +153,33 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
                     }
                 });
-                // Handle dismissal with: popup.setOnDismissListener(...);
-                // Show the menu
                 popup.show();
+
+            }
+        });
+
+        take_to_car_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LatLng parkLocation;
+                parkLocation = getParkingSharedPref();
+                if(parkLocation != null){
+                    navigateTo(parkLocation);
+                }
+            }
+        });
+
+        unPark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeParkingInfoSP();
+                Toast.makeText(myContext, "Parking Removed !!", Toast.LENGTH_LONG).show();
+                mMap.clear();
+                if(controlv.getVisibility() == View.VISIBLE){
+                    controlv.setVisibility(View.INVISIBLE);
+                }
+                mainPin.setVisibility(View.VISIBLE);
+
 
             }
         });
@@ -122,27 +189,28 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        setUpMapIfNeeded();
-    }
-
-    @Override
     public void onResume() {
+       //setUpMapIfNeeded();
         super.onResume();
-        setUpMapIfNeeded();
     }
 
-    /*
+
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         if (mMap != null) {
-            getActivity().getFragmentManager().beginTransaction()
-                    .remove(getActivity().getFragmentManager().findFragmentById(R.id.map)).commit();
             mMap = null;
+            try{
+                Fragment f = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+                if(f != null){
+                    getChildFragmentManager().beginTransaction()
+                            .remove(f).commit();
+                }
+            }catch(Exception e){
+            }
         }
+        super.onDestroyView();
     }
-    */
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -164,40 +232,15 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         mMap.getUiSettings(). setAllGesturesEnabled(true);
         mMap.setMyLocationEnabled(true);
 
+
         Location myLocation = getLastKnownLocation();
         if(myLocation!= null){
             myCurrentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            //mMap.addMarker(new MarkerOptions().position(myCurrentLocation).title("You are here!"));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myCurrentLocation, 13));
         }else{
             Toast.makeText(getActivity(), "cant get loc, GPS may be OFF !!", Toast.LENGTH_LONG).show();
         }
-    /*    mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                displayPopUp(marker);
 
-            }
-        });
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-            @Override
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
-
-            @Override
-            public View getInfoContents(final Marker marker) {
-                // Getting view from the layout file info_window_layout
-                View v = getActivity().getLayoutInflater().inflate(R.layout.detailedview, null);
-
-
-
-
-                // Returning the view containing InfoWindow contents
-                return v;
-
-            }
-        });*/
 
         mMap.setOnMarkerClickListener(
                 new GoogleMap.OnMarkerClickListener() {
@@ -230,7 +273,6 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         switch (item.getItemId()){
             case R.id.park_me:
                park_me1();
-                //Toast.makeText(getActivity(), "Parked dummy", Toast.LENGTH_SHORT).show();
                 break;
             default:
                 break;
@@ -269,7 +311,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
     }
 
-    public void showListDialogue(){
+  /*  public void showListDialogue(){
         final Dialog dialog = new Dialog(myContext);
         View view = getActivity().getLayoutInflater().inflate(R.layout.dialogue_list, null);
         ListView lv = (ListView) view.findViewById(R.id.parking_list);
@@ -296,7 +338,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         dialog.setContentView(view);
         dialog.show();
 
-    }
+    }*/
 
     public void addParkingtoDB(Parking parking){
         db = new ConnectDB(myContext);
@@ -313,10 +355,6 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                 + "\nLast Address = "
                 + parkFav.getAddress();
         return s;
-    }
-
-    public void showMsg(String msg){
-        Toast.makeText(myContext, msg, Toast.LENGTH_LONG).show();
     }
 
 
@@ -383,7 +421,13 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     protected void displayPopUp(Marker marker){
         mainPin.setVisibility(View.INVISIBLE);
         marker.setTitle("This one");
-        dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+        dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar){
+            @Override
+            public boolean onTouchEvent(MotionEvent event) {
+                this.dismiss();
+                return true;
+            }
+        };
         dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(R.layout.detailedview);
         dialog.setTitle(null);
@@ -402,7 +446,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         window.setAttributes(params);
         // Getting the parking from the marker
         final Parking  parking = mark_park.get(marker);
-
+        final String address = parking.getAddress();
         // components
         // Getting reference to the TextView to set latitude
         TextView street = (TextView) dialog.findViewById(R.id.str_add);
@@ -416,7 +460,17 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                 addParkingtoDB(parking);
                 Toast.makeText(myContext, "added to db", Toast.LENGTH_LONG).show();
 
-                dialog.dismiss();
+            }
+        });
+
+        addNav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String uri ="google.navigation:q=" + address;
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                myContext.startActivity(i);
+
             }
         });
         cross.setOnClickListener(new View.OnClickListener() {
@@ -451,57 +505,22 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     }
 
 
-    public void park_me(){
-        Location myLocation = getLastKnownLocation();
-        if(myLocation!= null){
-            myCurrentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myCurrentLocation, 13));
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), 4);
-            builder.setMessage(" Wanna Park ? ")
-                    .setTitle("Found a spot? GREAT !! ")
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            if(Global_var.getState()==0){
-
-                            }
-                            int x =  Global_var.getState();
-                            String parkingState = "parked stats = " +  x;
-                            Toast.makeText(myContext,parkingState, Toast.LENGTH_SHORT ).show();
-                            Global_var.setState(1);
-                            x = Global_var.getState();
-                            parkingState = "parked stats changed= " + Global_var.getState() ;
-                            Toast.makeText(myContext,parkingState, Toast.LENGTH_SHORT ).show();
-                        }
-                    })
-                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            AlertDialog dialog = builder.create();
-            Window win = dialog.getWindow();
-            win.setGravity(Gravity.BOTTOM);
-            dialog.show();
-        }else{
-            Toast.makeText(getActivity(), "cant get loc, GPS may be OFF !!", Toast.LENGTH_LONG).show();
-        }
-    }
-
-
-    public void park_me1() {
+   public void park_me1() {
         Location myLocation = getLastKnownLocation();
         if (myLocation != null) {
             myCurrentLocation = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myCurrentLocation, 13));
-            dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+            dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar){
+                @Override
+                public boolean onTouchEvent(MotionEvent event) {
+                    this.dismiss();
+                    return true;
+                }
+            };
             dialog.setCanceledOnTouchOutside(true);
             dialog.setContentView(R.layout.park_me_dialog);
             dialog.setTitle(null);
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     //do something on dismiss
@@ -509,6 +528,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             });
             // Setting dialogview
             Window window = dialog.getWindow();
+            window.setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
             window.setGravity(Gravity.BOTTOM);
             WindowManager.LayoutParams params = window.getAttributes();
 
@@ -523,20 +543,39 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             Button cancel = (Button) dialog.findViewById(R.id.cancel);
             Button yes_btn = (Button) dialog.findViewById(R.id.park_me_yes);
             ImageView cross = (ImageView) dialog.findViewById(R.id.cross_btn_1);
-            cancel.setOnClickListener(new View.OnClickListener() {
+            yes_btn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //add parking markers.
-                    Bitmap bMap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.flag);
-                    Bitmap adjustedImage = Bitmap.createScaledBitmap(bMap, 100, 100, true);
-                    Bitmap newImage = adjustImage(adjustedImage);
-                    BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(newImage);
+                    Date date = new Date(System.currentTimeMillis());
 
-                    Marker mark = mMap.addMarker(new MarkerOptions().position(myCurrentLocation).title("Parked").icon(icon));
+                    String result = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(date);
+                    String add = "You are parked at :\n"
+                            + getCompleteAddressString(myCurrentLocation.latitude, myCurrentLocation.longitude)
+                            + "\nSince: "
+                            + result;
+
+                    Marker mark = mMap.addMarker(new MarkerOptions().position(myCurrentLocation).title("You are parked here"));
+                    mark.showInfoWindow();
+
+                    //add to shared pref
+                    storeParkingSharedPref(myCurrentLocation.latitude, myCurrentLocation.longitude,System.currentTimeMillis());
+                    controlv.setVisibility(View.VISIBLE);
+                    mainPin.setVisibility(View.INVISIBLE);
+                    parker_info.setText(add);
+                    mMap.setPadding(0,0,0,300);
                     startParkingTimer();
-                    Toast.makeText(getActivity(), "This works", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "This works", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+
             });
             cross.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -550,12 +589,13 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             //street.setText(parking.getAddress());
             //time.setText(parking.getTimesAsString());
 
-            dialog.show();
 
+            dialog.show();
 
         }else{
             Toast.makeText(getActivity(), "cant get loc, GPS may be OFF !!", Toast.LENGTH_LONG).show();
         }
+
 
     }
 
@@ -567,5 +607,80 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
     public void showTimeOptions(){
 
+    }
+
+    private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
+        String strAdd = "";
+        Geocoder geocoder = new Geocoder(myContext, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                }
+                strAdd = strReturnedAddress.toString();
+
+            } else {
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return strAdd;
+    }
+
+    public void removeParkingInfoSP(){
+        //SharedPreferences pref = getActivity().getSharedPreferences(PREFS_NAME,Context.MODE_PRIVATE);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = pref.edit();
+        editor.remove("latitude");
+        editor.remove("longitude");
+        editor.putInt("parked", 0);
+        editor.commit();
+
+    }
+    public void storeParkingSharedPref(double lat, double lon, long mili){
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = pref.edit();
+        long d1 = Double.doubleToRawLongBits(lat);
+        long d2 = Double.doubleToRawLongBits(lon);
+        editor.putLong("latitude", Double.doubleToRawLongBits(lat));
+        editor.putLong("longitude", Double.doubleToRawLongBits(lon));
+        editor.putLong("time", mili);
+        editor.putInt("parked",1 );
+        editor.commit();
+
+    }
+
+    public LatLng getParkingSharedPref(){
+        LatLng current = null;
+        double myLat=-1;
+        double myLon=-1;
+        //SharedPreferences pref = getActivity().getSharedPreferences(PREFS_NAME,Context.MODE_PRIVATE);
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if ( pref.contains("latitude")){
+            long l1 = pref.getLong("latitude", 0);
+            myLat = Double.longBitsToDouble(l1);
+        }
+        if ( pref.contains("longitude")){
+            long l = pref.getLong("longitude", 0);
+            myLon = Double.longBitsToDouble(l);
+        }
+        if((myLat != -1)&& (myLon !=-1)){
+            current = new LatLng(myLat, myLon);
+        }
+
+       return current;
+    }
+
+    public void navigateTo(LatLng lat_lon){
+        String add = getCompleteAddressString(lat_lon.latitude, lat_lon.longitude);
+        String uri ="google.navigation:q=" + add;
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        myContext.startActivity(i);
     }
 }

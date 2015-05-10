@@ -9,7 +9,8 @@
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
-        android:name="com.google.android.gms.maps.SupportMapFragment" />
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        />
 
 
     <LinearLayout
@@ -19,7 +20,8 @@
         android:layout_gravity="center"
         android:layout_marginBottom="30dp"
         android:gravity="center"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        >
 
         <TextView
             android:id="@+id/locationMarkertext"
@@ -40,5 +42,53 @@
             android:layout_height="50dp"
             android:src="@drawable/pin" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/controls_parked"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        android:layout_gravity="bottom"
+        >
+        <TextView
+            android:id="@+id/parked_info"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:padding="20dp"
+            android:background="#CC000000"
+            android:textColor="#ffffff"
+            android:text="YOU ARE PARKED !!"/>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="horizontal"
+            android:background="#000000">
+            <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:text="Timer"
+                />
+            <Button
+                android:id="@+id/walk_to_Car"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:text="Walk to Car"
+                />
+            <Button
+                android:id="@+id/un_park"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:text="Un-park"
+                />
+          </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
 </RelativeLayout>
