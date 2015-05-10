@@ -1,9 +1,13 @@
 package parking.group6.csc413.projectmap;
 
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +17,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -49,6 +55,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +64,8 @@ import java.util.Locale;
  * Created by Swati on 5/5/2015.
  */
 public class HomeMapFrag extends Fragment implements getDataFromAsync{
+
+
     private SupportMapFragment mapFragment;
     ConnectDB db;
     Context myContext = null;
@@ -79,13 +88,23 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     LatLng parked;
     View controlv;
     TextView parker_info;
+    TextView  timeText;
     Button take_to_car_btn;
     Button unPark;
+    Button timer;
 
+    // alarm
+    public static String TAG = "HOME_FRAG";
+    public static String ALARM = "ALARM";
+    Intent intentAlarm;
+    AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+    Intent service_intent;
 
 
     public HomeMapFrag(){
     }
+
 
 
 
@@ -108,7 +127,8 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         parker_info = (TextView)rootView.findViewById(R.id.parked_info);
         take_to_car_btn= (Button)rootView.findViewById(R.id.walk_to_Car);
         unPark = (Button)rootView.findViewById(R.id.un_park);
-
+        timer = (Button)rootView.findViewById(R.id.timer_btn);
+        timeText=(TextView)rootView.findViewById(R.id.time_tick);
         myContext = getActivity();
         mDpi = getActivity().getResources().getDisplayMetrics().densityDpi;
 
@@ -179,7 +199,34 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                     controlv.setVisibility(View.INVISIBLE);
                 }
                 mainPin.setVisibility(View.VISIBLE);
+                //getActivity().stopService(service_intent);
 
+
+            }
+        });
+        timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                new CountDownTimer(30000, 1000) {
+
+                    public void onTick(long millisUntilFinished) {
+                        timeText.setVisibility(View.VISIBLE);
+                        timeText.setText("seconds remaining: " + millisUntilFinished / 1000);
+                    }
+
+                    public void onFinish() {
+                        timeText.setText("done!");
+                        Calendar cal1 = Calendar.getInstance(); // Now
+                        cal1.add(Calendar.SECOND, 5); // Change to five seconds from now
+                        alarmMgr = (AlarmManager)myContext.getSystemService(Context.ALARM_SERVICE);
+                        Intent intent = new Intent(myContext, AlarmReceiver.class);
+                        alarmIntent = PendingIntent.getBroadcast(myContext, 0, intent, 0);
+                        alarmMgr.set(AlarmManager.RTC_WAKEUP,
+                                SystemClock.elapsedRealtime(),
+                                alarmIntent);
+                    }
+                }.start();
 
             }
         });
@@ -191,10 +238,20 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     @Override
     public void onResume() {
        //setUpMapIfNeeded();
+        //getActivity().registerReceiver(br, new IntentFilter(TimerService.TIMER_BR));
+        getActivity().registerReceiver(receiver, new IntentFilter());
         super.onResume();
     }
 
-
+    @Override
+    public void onStop() {
+        try {
+            getActivity().unregisterReceiver(receiver);
+        } catch (Exception e) {
+            // Receiver was probably already stopped in onPause()
+        }
+        super.onStop();
+    }
     @Override
     public void onDestroyView() {
         if (mMap != null) {
@@ -359,6 +416,12 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
 
     @Override
+    public void onPause() {
+        getActivity().unregisterReceiver(receiver);
+        super.onPause();
+    }
+
+    @Override
     public void onTaskCompleted(JSONObject jobj) {
         // method of the interface getDataFromAsync
 
@@ -385,6 +448,12 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             }
 
         }
+    }
+
+    @Override
+    public void onTimeup() {
+        timeText.setText("YOUR PARKING TIME IS UP");
+
     }
 
 
@@ -683,4 +752,21 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         myContext.startActivity(i);
     }
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                String message = bundle.getString("mess");
+               // Long mili = bundle.getLong("countdown");
+                //Long mili = bundle.getLong("countdown");
+                Toast.makeText(getActivity(), "fromTime:"+ message, Toast.LENGTH_LONG).show();
+                timeText.setText("YOUR PARKING TIME IS UP");
+
+            }
+        }
+    };
 }

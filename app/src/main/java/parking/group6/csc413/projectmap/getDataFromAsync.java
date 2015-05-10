@@ -8,4 +8,5 @@ import org.json.JSONObject;
  */
 public interface getDataFromAsync {
     void onTaskCompleted(JSONObject jobj);
+    void onTimeup();
 }

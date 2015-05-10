@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import parking.group6.csc413.projectmap.Adapters.AppRating;
+
 public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
     public static FragmentManager fragmentManager;
@@ -122,7 +124,10 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
     }
 
+    @Override
+    public void onTimeup() {
 
+    }
 
 
     //--ANSHUL
@@ -186,10 +191,12 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
                 break;
             case 3:
+
                 Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
                 break;
             default:
-                Toast.makeText(MapsActivity.this, "Yet to be implemented!", Toast.LENGTH_SHORT).show();
+
+                AppRating.app_launched(this);
                 break;
         }
 
@@ -208,5 +215,6 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
             Log.e("MainActivity", "Error in creating fragment");
         }
     }
+
 
 }
