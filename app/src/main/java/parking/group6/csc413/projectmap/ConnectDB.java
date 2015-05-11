@@ -25,6 +25,7 @@ public class ConnectDB extends SQLiteOpenHelper  {
     public static final String LONGITUDE_COL = "Longitude";
     public static final String TIMES_COL = "Times";
 
+
     public ConnectDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -96,15 +97,11 @@ public class ConnectDB extends SQLiteOpenHelper  {
     }
 
     public void deleteParking(Parking parking) {
-        // 1. get reference to writable DB
+
         SQLiteDatabase db = this.getWritableDatabase();
 
-        // 2. build and execute delete
-        String query = "DELETE * FROM " + FAVORITES_TABLE +
-                       " WHERE " + ADDRESS_COL + " =  \"" + parking.getAddress() + "\"";
-        db.execSQL(query);
+        db.delete(FAVORITES_TABLE, ADDRESS_COL + "=" + "\""+ parking.getAddress() + "\"", null);
 
-        // 3. close
         db.close();
     }
 
