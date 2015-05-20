@@ -21,42 +21,46 @@ import org.json.JSONObject;
 
 import parking.group6.csc413.projectmap.Adapters.AppRating;
 
+
+/**
+ * Mainactivity class that hols the navigation drawer and
+ * swaps Fragments including the map fragment and the favorite fragment based on the item selected in the navigation drawer.
+ * @author csc 413 group 6
+ * @version 1
+ */
 public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
     public static FragmentManager fragmentManager;
     Fragment fragment = null;
-    //--ANSHUL
     private ListView mDrawerList;
     private DrawerLayout mDrawerLayout;
     private ArrayAdapter<String> mAdapter;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
-    //--END_ANSHUL
 
 
-
+    /**
+     * Overridden Oncreate method of the activity, inflates the layout and
+     * sets the view and sets up the navigation drawer
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         fragmentManager = getSupportFragmentManager();
 
-        //--ANSHUL
+
         mDrawerList = (ListView)findViewById(R.id.navList);
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mActivityTitle = getTitle().toString();
-        //--END_ANSHUL
-        /*
 
-        */
-
-        //--ANSHUL
         addDrawerItems();
         setupDrawer();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
-        //--END_ANSHUL
+
 
         if (savedInstanceState == null) {
             selectItem(0);
@@ -64,73 +68,77 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
     }// end oncreate
 
+    /**
+     * calls super OnResume
+     */
     @Override
     protected void onResume() {
         super.onResume();
 
-       // setUpMapIfNeeded();
     }
 
-    //--ANSHUL
+
+    /**
+     * calls the super.onPostCreate
+     * Syncs the state of the navigation drawer
+     * @param savedInstanceState
+     */
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
         mDrawerToggle.syncState();
     }
 
+    /**
+     * Overriden method, Toggles the navigation drawer on change of configuration.
+     * @param newConfig
+     */
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
-    //--END_ANSHUL
 
-
-
-
-
-
-
-
+    /**
+     * Inflates the option menu
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-       // getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+    /**
+     * Sets listener on option selected
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
             case R.id.cancel_action:
-                //String check = checkParkingDB();
-                //showMsg(check);
-        }
 
-        //--ANSHUL
+        }
         // Activate the navigation drawer toggle
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        //--END_ANSHUL
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onTaskCompleted(JSONObject jobj) {
 
-
-    }
-
-    @Override
-    public void onTimeup() {
-
     }
 
 
-    //--ANSHUL
+    /**
+     * Adds the options to the navigation drawer.
+     */
     private void addDrawerItems() {
         String[] parkArray = { "Map", "Favorites", "Park Me", "Contact Us", "Rate the app" };
         mAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, parkArray);
@@ -145,6 +153,9 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
         });
     }
 
+    /**
+     * Sets up the navigation drawer.
+     */
     private void setupDrawer() {
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
 
@@ -168,14 +179,13 @@ public class MapsActivity extends ActionBarActivity implements getDataFromAsync{
 
 
     }
-    //--END_ANSHUL
 
-
-    /** Swaps fragments in the main content view */
+    /**
+     * Swaps fragments in the main content view
+     * @param position and integer indicating position selected
+     */
     private void selectItem(int position) {
         // Create a new fragment and specify the planet to show based on position
-
-
         // Insert the fragment by replacing any existing fragment
         switch (position) {
             case 0:

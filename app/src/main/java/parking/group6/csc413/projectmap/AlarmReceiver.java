@@ -11,9 +11,22 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
+/**
+ * <h1>AlarmReceiver is a helper class that receives the BroadCast. It extend android.content.BroadcastReceiver class</h1>
+ * <p> The class overrides onReceive method to vake up the lock and push the notification using the NotificationCompat builder</p>
+ * <b> Authors are defined as anyone who wrote code for the class.</b>
+ * @author csc 413 group 6
+ * @version 1
+ * @see android.content.BroadcastReceiver
+ */
 public class AlarmReceiver extends BroadcastReceiver {
-    getDataFromAsync dataListener;
     int mid;
+
+    /**
+     * This method receives the broadcast intent and fires the vibration and push notification.
+     * @param context
+     * @param intent
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
@@ -39,17 +52,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                         .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("SanFran ParkIt")
                         .setContentText("Time is up !");
-// Creates an explicit intent for an Activity in your app
 
-
-// The stack builder object will contain an artificial back stack for the
-// started Activity.
-// This ensures that navigating backward from the Activity leads out of
-// your application to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-// Adds the back stack for the Intent (but not the Intent itself)
         stackBuilder.addParentStack(MapsActivity.class);
-// Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(
@@ -59,9 +64,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-// mId allows you to update the notification later on.
         mNotificationManager.notify(mid, mBuilder.build());
-       //Toast.makeText(context, "OnReceive alarm test", Toast.LENGTH_SHORT).show();
 
     }
 }

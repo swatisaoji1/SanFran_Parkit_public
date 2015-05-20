@@ -8,10 +8,18 @@ import java.util.Iterator;
 
 /**
  * This class will parse the JSON string to parking object
+ * @author csc 413 group 6
+ * @ version 1
  */
 public class JSONParseSF {
     JSONObject json;
 
+    /**
+     * Parses the JSONObject and returns the parking array
+     * @param jobj
+     * @return Parking[]
+     * @throws JSONException
+     */
     public static Parking[] parseJsonFromSF(JSONObject jobj) throws JSONException {
         JSONArray allParking = new JSONArray();
         int no_parking = Integer.parseInt(jobj.getString("NUM_RECORDS"));
@@ -39,8 +47,13 @@ public class JSONParseSF {
         return new Parking[0];
     }
 
+    /**
+     * Returns the rates of the parking from json object
+     * @param jobj
+     * @return String
+     * @throws JSONException
+     */
     private static String[] parseRates(JSONObject jobj) throws JSONException {
-        // Uses iterator to create JSONArray from nested JSONObjects in rates
         JSONObject ratesObject = jobj.getJSONObject("RATES");
         Iterator keys = ratesObject.keys();
         JSONArray jsonArray = new JSONArray();
@@ -57,6 +70,12 @@ public class JSONParseSF {
         return parsedStrings;
     }
 
+    /**
+     * Returns the rate from the JSON object
+     * @param rateObject
+     * @return string
+     * @throws JSONException
+     */
     private static String parseRate(JSONObject rateObject) throws JSONException {
         StringBuilder sb = new StringBuilder();
         sb.append(rateObject.getString("BEG"));

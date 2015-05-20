@@ -10,6 +10,12 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/**
+ * AppRating class handles the click on the "Rate us " on navigation and pops up the custom dialogue
+ * and directs the user to google play for rating the app.
+ * @author csc 413 group 6
+ * @version 1
+ */
 public class AppRating {
     private final static String APP_TITLE = "SanFran ParkIt";// App Name
     private final static String APP_PNAME = "parking.group6.csc413.projectmap";// Package Name
@@ -17,6 +23,13 @@ public class AppRating {
     private final static int DAYS_UNTIL_PROMPT = 3;//Min number of days
     private final static int LAUNCHES_UNTIL_PROMPT = 3;//Min number of launches
 
+
+    /**
+     * This method checks the Preferences for user choice and accordingly displays the option
+     * to rate the app by calling the showratedialog method
+     * @param mContext
+     * @see showRateDialog
+     */
     public static void app_launched(Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences("apprater", 0);
         if (prefs.getBoolean("dontshowagain", false)) {
@@ -46,6 +59,12 @@ public class AppRating {
         showRateDialog(mContext, editor);
         editor.commit();
     }
+
+    /**
+     * Displays the Dialog to rate the app / not show the dialog again, User choice is then stored in Preferences.
+     * @param mContext
+     * @param editor
+     */
 
     public static void showRateDialog(final Context mContext, final SharedPreferences.Editor editor) {
         final Dialog dialog = new Dialog(mContext);
@@ -78,19 +97,6 @@ public class AppRating {
             }
         });
         ll.addView(b2);
-
-/*        Button b3 = new Button(mContext);
-        b3.setText("No, thanks");
-        b3.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (editor != null) {
-                    editor.putBoolean("dontshowagain", true);
-                    editor.commit();
-                }
-                dialog.dismiss();
-            }
-        });
-        ll.addView(b3);*/
 
         dialog.setContentView(ll);
         dialog.show();

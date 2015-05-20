@@ -61,7 +61,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 /**
- * Created by Swati on 5/5/2015.
+ * HomeMap Fragment Hosts the main Google Map implements the getDataFromAsync interface
+ * @author  csc 413 Group 6
+ * @version 1
  */
 public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
@@ -102,12 +104,17 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     Intent service_intent;
 
 
+    /**
+     * Default Constructor
+     */
     public HomeMapFrag(){
     }
 
 
-
-
+    /**
+     * Overriden method calls super.Oncreate
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,6 +122,14 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     }
 
 
+    /**
+     * Inflates the layout , which in this case is a google map
+     * Gets the Parking info from the Preferencs and sets the view visibility accordingly
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -207,9 +222,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         timer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 new CountDownTimer(30000, 1000) {
-
                     public void onTick(long millisUntilFinished) {
                         timeText.setVisibility(View.VISIBLE);
                         timeText.setText("seconds remaining: " + millisUntilFinished / 1000);
@@ -235,23 +248,32 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
     }
 
+    /**
+     * Overriden Method OnResume
+     * Re-registers the Broadcast receiver on activity resume
+     *
+     */
     @Override
     public void onResume() {
-       //setUpMapIfNeeded();
-        //getActivity().registerReceiver(br, new IntentFilter(TimerService.TIMER_BR));
         getActivity().registerReceiver(receiver, new IntentFilter());
         super.onResume();
     }
 
+    /**
+     * unregisters the Broadcast receivr onStop
+     */
     @Override
     public void onStop() {
         try {
             getActivity().unregisterReceiver(receiver);
         } catch (Exception e) {
-            // Receiver was probably already stopped in onPause()
         }
         super.onStop();
     }
+
+    /**
+     * Removes the fragment on view Destroy
+     */
     @Override
     public void onDestroyView() {
         if (mMap != null) {
@@ -268,19 +290,25 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         super.onDestroyView();
     }
 
+    /**
+     * Checks if Map is null, calls setUpMap if needed
+     */
     private void setUpMapIfNeeded() {
-        // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
-            // Try to obtain the map from the SupportMapFragment.
             FragmentManager myFM = getChildFragmentManager();
             mapFragment = (SupportMapFragment)myFM.findFragmentById(R.id.map);
             mMap = mapFragment.getMap();
-            // Check if we were successful in obtaining the map.
             if (mMap != null) {
                 setUpMap();
             }
         }
     }
+
+    /**
+     * If the map is null this method is called to set up.
+     * Enables the map control , zooms to current location.
+     * Sets on click listeners.
+     */
     private void setUpMap() {
 
         mMap.clear();
@@ -318,6 +346,11 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                 });
     }
 
+    /**
+     * Inflates the Option Menu
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -325,6 +358,11 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
     }
 
+    /**
+     * Set listener on Option selected
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
@@ -339,6 +377,10 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Uses system location services to get the current location fo the user.
+     * @return Location
+     */
     private Location getLastKnownLocation() {
         mLocationManager = (LocationManager)getActivity().getSystemService(myContext.LOCATION_SERVICE);
         List<String> providers = mLocationManager.getProviders(true);
@@ -355,6 +397,11 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         return bestLocation;
     }
 
+    /**
+     * Calls the async Task (GetParking) to connect to the SFPark and get the parking information.
+     * @param lat
+     * @param lon
+     */
     private void getMessageFromSFpark(double lat, double lon){
         searchPoint = new LatLng(lat, lon);
         String myurl = "http://api.sfpark.org/sfpark/rest/availabilityservice?lat="
@@ -368,41 +415,21 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
     }
 
-  /*  public void showListDialogue(){
-        final Dialog dialog = new Dialog(myContext);
-        View view = getActivity().getLayoutInflater().inflate(R.layout.dialogue_list, null);
-        ListView lv = (ListView) view.findViewById(R.id.parking_list);
-        DialogueListAdapter myPark = new DialogueListAdapter(myContext, parkingList);
-        // on click listener here:
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // show action items
-                Parking newOne = (Parking)parent.getAdapter().getItem(position);
-                // now add parking to database.
 
-                addParkingtoDB(newOne);
-                Toast.makeText(myContext, "added to db", Toast.LENGTH_LONG).show();
-                dialog.dismiss();
-
-
-
-            }
-        });
-
-        lv.setAdapter(myPark);
-        dialog.setTitle("Parking Nearby :");
-        dialog.setContentView(view);
-        dialog.show();
-
-    }*/
-
+    /**
+     * Connects to the Databse and adds parking to the favorites table
+     * @param parking
+     */
     public void addParkingtoDB(Parking parking){
         db = new ConnectDB(myContext);
         db.addParking(parking);
     }
 
 
+    /**
+     * Returns the last ( most recent )favorite drom the databse
+     * @return String
+     */
     public String checkParkingDB(){
         db = new ConnectDB(myContext);
         ArrayList<Parking> parkList = db.getParkingList();
@@ -414,17 +441,23 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         return s;
     }
 
-
+    /**
+     * Overriden method
+     * Unregisters the broadcast receiver
+     */
     @Override
     public void onPause() {
         getActivity().unregisterReceiver(receiver);
         super.onPause();
     }
 
+    /**
+     * called from the AsyncTask and returns the JsonObject
+     * @param jobj
+     */
     @Override
     public void onTaskCompleted(JSONObject jobj) {
         // method of the interface getDataFromAsync
-
 
         try {
             parkings = JSONParseSF.parseJsonFromSF(jobj);
@@ -438,7 +471,6 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             //String address = parkings[0].getAddress();
             //Toast.makeText(myContext, address, Toast.LENGTH_LONG).show();
             if(parkingList.size()>0){
-                //showListDialogue();
 
                 putMarkers(parkingList);
                 //TODO check this code
@@ -450,13 +482,11 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         }
     }
 
-    @Override
-    public void onTimeup() {
-        timeText.setText("YOUR PARKING TIME IS UP");
 
-    }
-
-
+    /**
+     * Takes the ArrayList of Parking objects and displays the markets on the map.
+     * @param parking
+     */
     public void putMarkers(ArrayList<Parking> parking){
         mMap.clear();
         // add search point
@@ -487,6 +517,12 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         }
     }
 
+    /**
+     * Shows the custom dialogue box , with info about the selected parking location.
+     * On click listeners to add the parking to favorite
+     * Or to navigate to the Parking
+     * @param marker
+     */
     protected void displayPopUp(Marker marker){
         mainPin.setVisibility(View.INVISIBLE);
         marker.setTitle("This one");
@@ -506,7 +542,6 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                 mainPin.setVisibility(View.VISIBLE);
             }
         });
-        // Setting dialogview
         Window window = dialog.getWindow();
         window.setGravity(Gravity.BOTTOM);
         WindowManager.LayoutParams params = window.getAttributes();
@@ -559,7 +594,11 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     }
 
 
-
+    /**
+     * Helper method that adjusts the size of the bitmap image based on screen size.
+     * @param image
+     * @return
+     */
     protected Bitmap adjustImage(Bitmap image) {
         int dpi = image.getDensity();
         if (dpi == mDpi)
@@ -573,7 +612,10 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         }
     }
 
-
+    /**
+     * Parks the user to the current location, Adds the user info to the shared preference.
+     * Displays the additional controls ( when user is parked)
+     */
    public void park_me1() {
         Location myLocation = getLastKnownLocation();
         if (myLocation != null) {
@@ -633,7 +675,7 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
                     mainPin.setVisibility(View.INVISIBLE);
                     parker_info.setText(add);
                     mMap.setPadding(0,0,0,300);
-                    startParkingTimer();
+                    //startParkingTimer();
                     //Toast.makeText(getActivity(), "This works", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 }
@@ -669,15 +711,12 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
     }
 
 
-    public void  startParkingTimer(){
-        showTimeOptions();
-
-    }
-
-    public void showTimeOptions(){
-
-    }
-
+    /**
+     * Uses the Geocoder to get complete postal address from latitude and longitude.
+     * @param LATITUDE
+     * @param LONGITUDE
+     * @return String address
+     */
     private String getCompleteAddressString(double LATITUDE, double LONGITUDE) {
         String strAdd = "";
         Geocoder geocoder = new Geocoder(myContext, Locale.getDefault());
@@ -686,22 +725,20 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
             if (addresses != null) {
                 Address returnedAddress = addresses.get(0);
                 StringBuilder strReturnedAddress = new StringBuilder("");
-
                 for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
                     strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
                 }
                 strAdd = strReturnedAddress.toString();
-
-            } else {
-
             }
         } catch (Exception e) {
             e.printStackTrace();
-
         }
         return strAdd;
     }
 
+    /**
+     * Removes the parking info from the Preferences.
+     */
     public void removeParkingInfoSP(){
         //SharedPreferences pref = getActivity().getSharedPreferences(PREFS_NAME,Context.MODE_PRIVATE);
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -712,6 +749,13 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         editor.commit();
 
     }
+
+    /**
+     * Stores the Parking info in Shared Preferences
+     * @param lat
+     * @param lon
+     * @param mili
+     */
     public void storeParkingSharedPref(double lat, double lon, long mili){
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = pref.edit();
@@ -725,6 +769,10 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
 
     }
 
+    /**
+     * Gets the Parking info from the Shared Preferences
+     * @return LatLng
+     */
     public LatLng getParkingSharedPref(){
         LatLng current = null;
         double myLat=-1;
@@ -746,6 +794,10 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
        return current;
     }
 
+    /**
+     * Starts the ACTION_VIEW intent by calling the google navigation
+     * @param lat_lon
+     */
     public void navigateTo(LatLng lat_lon){
         String add = getCompleteAddressString(lat_lon.latitude, lat_lon.longitude);
         String uri ="google.navigation:q=" + add;
@@ -753,16 +805,16 @@ public class HomeMapFrag extends Fragment implements getDataFromAsync{
         myContext.startActivity(i);
     }
 
+    /**
+     * Broadcast receiver to receive the message when coundowntimer is completed.
+     */
     private BroadcastReceiver receiver = new BroadcastReceiver() {
-
         @Override
         public void onReceive(Context context, Intent intent) {
 
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
                 String message = bundle.getString("mess");
-               // Long mili = bundle.getLong("countdown");
-                //Long mili = bundle.getLong("countdown");
                 Toast.makeText(getActivity(), "fromTime:"+ message, Toast.LENGTH_LONG).show();
                 timeText.setText("YOUR PARKING TIME IS UP");
 

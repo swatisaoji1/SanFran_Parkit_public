@@ -11,6 +11,8 @@ import java.util.ArrayList;
 /**
  * These functions are used to manage the SQLite database. Basic functionality includes adding,
  * deleting, and searching for favorite addresses.
+ * @author csc 413 group 6
+ * @version 1
  */
 public class ConnectDB extends SQLiteOpenHelper  {
 
@@ -26,10 +28,18 @@ public class ConnectDB extends SQLiteOpenHelper  {
     public static final String TIMES_COL = "Times";
 
 
+    /**
+     * Constructor , calls the constructor of the super class.
+     * @param context
+     */
     public ConnectDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    /**
+     * Creates the database table if it does not exist by executing the sql query
+     * @param db
+     */
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_FAVORITES_TABLE = "CREATE TABLE " +
@@ -42,12 +52,22 @@ public class ConnectDB extends SQLiteOpenHelper  {
         db.execSQL(CREATE_FAVORITES_TABLE);
     }
 
+    /**
+     * Upgraded the table if the new version of the app is available
+     * @param db
+     * @param oldVersion
+     * @param newVersion
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + FAVORITES_TABLE);
         this.onCreate(db);
     }
 
+    /**
+     * Adds Parking object to the database.
+     * @param newParking
+     */
     public void addParking(Parking newParking) {
         // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
@@ -66,7 +86,10 @@ public class ConnectDB extends SQLiteOpenHelper  {
         db.close();
     }
 
-
+    /**
+     * gets the Parking object list from the database table
+     * @return ArrayList<Parking>
+     */
     public ArrayList<Parking> getParkingList(){
         // 1. get reference to readable DB
         SQLiteDatabase db = this.getReadableDatabase();
@@ -96,6 +119,11 @@ public class ConnectDB extends SQLiteOpenHelper  {
         return parkingList;
     }
 
+    /**
+     * Deletes the Parking entry from the database.
+     * SQL Query matches the Address to delete the entry
+     * @param parking
+     */
     public void deleteParking(Parking parking) {
 
         SQLiteDatabase db = this.getWritableDatabase();
