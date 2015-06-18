@@ -127,9 +127,7 @@ public class ConnectDB extends SQLiteOpenHelper  {
     public void deleteParking(Parking parking) {
 
         SQLiteDatabase db = this.getWritableDatabase();
-
         db.delete(FAVORITES_TABLE, ADDRESS_COL + "=" + "\""+ parking.getAddress() + "\"", null);
-
         db.close();
     }
 

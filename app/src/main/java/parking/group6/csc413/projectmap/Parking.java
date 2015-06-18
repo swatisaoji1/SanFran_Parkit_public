@@ -122,4 +122,24 @@ public class Parking {
         }
         return sb.toString();
     }
+
+    @Override
+    public String toString() {
+       return "Parking: " + this.getAddress();
+    }
+
+    public boolean equals(Object obj){
+        if (!(obj instanceof Parking))
+            return false;
+        if (obj == this)
+            return true;
+
+        Parking rhs = (Parking) obj;
+        if (rhs.getAddress().equals(this.getAddress())){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
 }
